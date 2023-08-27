@@ -18,12 +18,12 @@ const productModel = new mongoose.Schema(
       required: [true, "please provide price"],
     },
     quantity: {
-      type: String,
+      type: Number,
       required: [true, "Please Provide quantity"],
     },
     available: {
       type: Number,
-      ref: "count",
+      // ref: "count",
       // required: true,
     },
     desc: {

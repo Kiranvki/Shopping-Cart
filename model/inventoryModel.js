@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const inventoryModel = new mongoose.Schema(
   {
     productId: {
-      type: mongoose.Schema.ObjectId,
+      type: String,
       ref: "products",
       required: true,
     },
     count: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
