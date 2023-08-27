@@ -5,7 +5,7 @@ const applyDiscountMiddleware=require('../middlware/discount')
 
 route.post(`/checkout`,applyDiscountMiddleware,orderCtrl.newOrder);
 
-route.get(`/allOrders`,orderCtrl.getAll);
+route.get('/orders/:productOrderId', orderCtrl.getAll);
 
 
 
