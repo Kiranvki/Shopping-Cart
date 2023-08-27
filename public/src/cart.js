@@ -174,20 +174,20 @@ let TotalAmount = () => {
       .map((x) => {
         let { id, item } = x;
         let filterData = shopItems.find((x) => x.id === id);
-       
+
         return filterData.price * item;
-      
       })
       .reduce((x, y) => x + y, 0);
 
     return (label.innerHTML = `
     <h2>Total Bill : Rs ${amount}</h2>
-    <button class="checkout">Checkout</button>
+    <button class="checkout" onClick="checkOut(${amount}, document.getElementById('name').value)">Checkout</button>
     <button onClick="clearCart()" class="removeAll">Clear Cart</button>
    
     <div class="form-group">
       <input type="text" name="name" class="form-control" id="name" value="">
-      <button class="couponbutton" onclick="apply_coupon()">apply coupon</button>
+     <!-- <button class="couponbutton" onclick="apply_coupon()">apply coupon</button> -->
+      <label class="">Enter Coupon Code</label>
     </div>
     <br><br>
     `);
@@ -201,14 +201,47 @@ TotalAmount();
  */
 
 //  var clearCart = () => {
-  function clearCart(){
-  console.log('testing');
+function clearCart() {
+  console.log("testing");
   basket = [];
   generateCartItems();
   calculation();
   localStorage.setItem("data", JSON.stringify(basket));
-};
+}
 
-function apply_coupon(){
-  const coupon= '100';
+function apply_coupon() {
+  const coupon = "100";
+}
+
+// Checout function
+
+function checkOut(amount, couponCode) {
+  const postData = {
+    coupon: couponCode,
+    cart: basket.map((x) => ({ productId: x.id, count: x.item })),
+    finalTotal: amount
+  };
+
+  // Replace this with your server endpoint
+  const url = "/api/v1/checkout";
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(postData),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Failed to post data");
+      }
+    })
+    .then((data) => {
+      console.log("Response data:", data);
+    })
+    .catch((error) => {
+      console.error("An error occurred:", error);
+    });
 }

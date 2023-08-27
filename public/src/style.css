@@ -217,7 +217,7 @@ input:focus {
   /*Sometime the blue border you see is from the box-shadow and removing box-shadow will remove the border*/
 }
 .form-group{
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .couponbutton {
@@ -234,3 +234,9 @@ input:focus {
 }
 
 .couponbutton:hover{background-color:#3e1313;}
+
+
+
+table, th, td {
+  border:1px solid black;
+}
