@@ -2,15 +2,36 @@ const Order = require("../model/orderModel");
 // const Auth = require('../model/authModel');
 const Product = require("../model/productModel");
 const Inventory = require("../model/inventoryModel");
+const Coupon = require("../model/couponModel");
 
 // stock and sold update
-const updateStock = async (id, quantity, oldSold, oldStock) => {
-  await Inventory.findOneAndUpdate(
-    { _id: id },
-    {
-      count: Number(oldStock - quantity),
+const updateStock = async (productId, quantity) => {
+  try {
+    const product = await Product.findOne({ id: productId });
+
+    if (!product) {
+      throw new Error("Product not found");
     }
-  );
+
+    const newAvailableQty = product.quantity - quantity;
+
+    if (newAvailableQty < 0) {
+      throw new Error("Insufficient stock");
+    }
+
+    product.available = newAvailableQty;
+    await product.save();
+
+    const inventory = await Inventory.findOne({ _id: product._id });
+
+    console.log('object :>> ', product._id);
+    if (inventory) {
+      inventory.count = product.available;
+      await inventory.save();
+    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 // random order id generation
@@ -26,25 +47,20 @@ const generateRandomOrderId = (len) => {
 const orderCtrl = {
   newOrder: async (req, res) => {
     try {
-      let orderId = generateRandomOrderId(8);
       let { cart, finalTotal } = req.body;
+      let orderId = generateRandomOrderId(8);
+      let discountedPrice = req.discountedPrice;
 
-      cart.filter((item) => {
-        return updateStock(item._id, item.quantity, item.sold, item.stock);
-      });
+      for (const item of cart) {
+        await updateStock(item.productId, item.count);
+      }
 
       await Order.create({
         orderId,
         cart,
-        finalTotal,
+        totalAmount: finalTotal,
+        amountOwed: discountedPrice,
       });
-
-    //   await Auth.findOneAndUpdate(
-    //     { _id: req.user.id },
-    //     {
-    //       cart: [],
-    //     }
-    //   );
 
       return res
         .status(200)
@@ -53,6 +69,7 @@ const orderCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
+  
   getAll: async (req, res) => {
     try {
       let orders = await Order.find();

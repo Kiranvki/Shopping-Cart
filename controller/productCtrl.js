@@ -1,5 +1,7 @@
 const Product = require("../model/productModel");
 const Coupon = require("../model/couponModel");
+const Inventory = require("../model/inventoryModel");
+const mongoose = require('mongoose');
 
 const generateRandomOrderId = (len) => {
   let rString = "";
@@ -24,12 +26,19 @@ const ProductCtrl = {
     try {
       // res.json({msg:"hi"})
       let productId = generateRandomOrderId(8);
+      let Product_id=mongoose.Types.ObjectId()
       let product = await Product.create({
+        _id:Product_id,
         id: productId,
         title: req.body.title,
         desc: req.body.desc,
         quantity: req.body.quantity,
         price: req.body.price,
+      });
+      await Inventory.create({
+        _id:Product_id,
+        productId: productId,
+        count: req.body.quantity,
       });
       res.status(200).json({ msg: "product created successfully " });
     } catch (err) {

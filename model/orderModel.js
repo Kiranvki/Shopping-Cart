@@ -9,10 +9,13 @@ const Order=new mongoose.Schema({
         type:Array,
         default:[]
     },
-    finalTotal:{
+    totalAmount:{
         type:Number,
         // required:true
     },
+    amountOwed:{
+        type:Number,
+    }
 },{
     collection:"orders",
     timestamps:true
