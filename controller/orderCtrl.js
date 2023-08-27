@@ -24,7 +24,7 @@ const updateStock = async (productId, quantity) => {
 
     const inventory = await Inventory.findOne({ _id: product._id });
 
-    console.log('object :>> ', product._id);
+    console.log("object :>> ", product._id);
     if (inventory) {
       inventory.count = product.available;
       await inventory.save();
@@ -69,16 +69,38 @@ const orderCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
-  
+
   getAll: async (req, res) => {
     try {
-      let orders = await Order.find();
-      return res.status(200).json({
-        orders: orders,
-        length: orders.length,
+      let productOrderId = req.params.productOrderId;
+
+      const order = await Order.findOne({orderId: productOrderId });
+
+
+      if (!order) {
+        return res.status(404).json({ msg: "Order not found" });
+      }
+
+      const responseProducts = await Promise.all(
+        order.cart.map(async (item) => {
+          const product = await Product.findOne({ productId: item.productId });
+          return {
+            productId: product.productId,
+            count: item.count,
+            name: product.name,
+            description: product.description,
+            price:product.price
+          };
+        })
+      );
+
+      res.json({
+        Products:responseProducts,
+        totalAmount:order.totalAmount,
+        amountOwed:order.amountOwed
       });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+    } catch (error) {
+      res.status(500).json({ msg: "An error occurred" });
     }
   },
   updateOrderStatus: async (req, res) => {
@@ -88,6 +110,8 @@ const orderCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
+
+
   delete: async (req, res) => {
     try {
       await Order.findOneAndDelete({ _id: req.params.id });

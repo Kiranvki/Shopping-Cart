@@ -223,7 +223,7 @@ function checkOut(amount, couponCode) {
   };
 
   // Replace this with your server endpoint
-  const url = "/api/v1/checkout";
+  const url = "/api/v1/order/checkout";
   fetch(url, {
     method: "POST",
     headers: {
@@ -233,7 +233,12 @@ function checkOut(amount, couponCode) {
   })
     .then((response) => {
       if (response.ok) {
+        basket = [];
+        generateCartItems();
+        calculation();
+        localStorage.setItem("data", JSON.stringify(basket));
         return response.json();
+
       } else {
         throw new Error("Failed to post data");
       }
