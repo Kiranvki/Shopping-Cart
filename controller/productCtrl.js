@@ -1,7 +1,7 @@
 const Product = require("../model/productModel");
 const Coupon = require("../model/couponModel");
 const Inventory = require("../model/inventoryModel");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const generateRandomOrderId = (len) => {
   let rString = "";
@@ -12,11 +12,10 @@ const generateRandomOrderId = (len) => {
   return rString;
 };
 
-
 const ProductCtrl = {
   getAllProducts: async (req, res) => {
     try {
-      let data = await Product.find();
+      let data = await Product.find({ quantity: { $gt: 0 }});
       res.json({ products: data, length: data.length });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -26,9 +25,9 @@ const ProductCtrl = {
     try {
       // res.json({msg:"hi"})
       let productId = generateRandomOrderId(8);
-      let Product_id=mongoose.Types.ObjectId()
+      let Product_id = mongoose.Types.ObjectId();
       let product = await Product.create({
-        _id:Product_id,
+        _id: Product_id,
         id: productId,
         title: req.body.title,
         desc: req.body.desc,
@@ -36,7 +35,7 @@ const ProductCtrl = {
         price: req.body.price,
       });
       await Inventory.create({
-        _id:Product_id,
+        _id: Product_id,
         productId: productId,
         count: req.body.quantity,
       });
@@ -60,19 +59,6 @@ const ProductCtrl = {
     try {
       let data = await Coupon.find();
       res.json({ data });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
-    }
-  },
-
-  updateProduct: async (req, res) => {
-    try {
-      let product = await Product.findOneAndUpdate(
-        { _id: req.params.id },
-        req.body
-      );
-      if (!product) return res.status(400).json({ msg: "Product not exists" });
-      res.status(200).json({ msg: "Product updated" });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

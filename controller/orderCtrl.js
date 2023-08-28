@@ -106,23 +106,7 @@ const orderCtrl = {
       res.status(500).json({ msg: "An error occurred" });
     }
   },
-  updateOrderStatus: async (req, res) => {
-    try {
-      res.json("update order status");
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
-    }
-  },
-
-
-  delete: async (req, res) => {
-    try {
-      await Order.findOneAndDelete({ _id: req.params.id });
-      res.status(200).json({ msg: "Order deleted successfuly" });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
-    }
-  },
+  
 };
 
 module.exports = orderCtrl;
