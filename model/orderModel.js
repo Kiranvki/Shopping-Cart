@@ -5,6 +5,9 @@ const Order=new mongoose.Schema({
         required:true,
         unique:true
     },
+    coupon:{
+        type:String,
+    },
     cart:{
         type:Array,
         default:[]

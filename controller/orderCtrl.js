@@ -38,7 +38,7 @@ const updateStock = async (productId, quantity) => {
 const generateRandomOrderId = (len) => {
   let rString = "";
   let charSet =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*#$";
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   for (i = 0; i < len; i++)
     rString += charSet.charAt(Math.floor(Math.random() * charSet.length));
   return rString;
@@ -47,7 +47,7 @@ const generateRandomOrderId = (len) => {
 const orderCtrl = {
   newOrder: async (req, res) => {
     try {
-      let { cart, finalTotal } = req.body;
+      let { cart, finalTotal,coupon } = req.body;
       let orderId = generateRandomOrderId(8);
       let discountedPrice = req.discountedPrice;
 
@@ -56,15 +56,17 @@ const orderCtrl = {
       }
 
       await Order.create({
-        orderId,
+        coupon:coupon,
+        orderId:orderId,
         cart,
         totalAmount: finalTotal,
         amountOwed: discountedPrice,
+        
       });
 
       return res
         .status(200)
-        .json({ msg: `Order confirmed, order id is ${orderId}` });
+        .json({orderId:orderId});
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -76,25 +78,26 @@ const orderCtrl = {
 
       const order = await Order.findOne({orderId: productOrderId });
 
-
       if (!order) {
         return res.status(404).json({ msg: "Order not found" });
       }
 
       const responseProducts = await Promise.all(
         order.cart.map(async (item) => {
-          const product = await Product.findOne({ productId: item.productId });
+          const product = await Product.findOne({ id: item.productId });
           return {
+            _id:product._id,
             productId: product.productId,
-            count: item.count,
-            name: product.name,
-            description: product.description,
-            price:product.price
+            title: product.title,
+            description: product.desc,
+            priceInRs:product.price,
+            count: product.available,
           };
         })
       );
 
       res.json({
+        coupon:order.coupon,
         Products:responseProducts,
         totalAmount:order.totalAmount,
         amountOwed:order.amountOwed
