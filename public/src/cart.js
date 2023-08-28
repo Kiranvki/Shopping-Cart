@@ -244,7 +244,12 @@ function checkOut(amount, couponCode) {
       }
     })
     .then((data) => {
-      console.log("Response data:", data);
+      console.log("Response data:", data.msg);
+      if(data){
+        let id = data
+        localStorage.setItem("Xid", JSON.stringify(id));
+        window.location.href = "http://localhost:5000/table.html"
+      }
     })
     .catch((error) => {
       console.error("An error occurred:", error);
