@@ -91,7 +91,7 @@ const orderCtrl = {
             title: product.title,
             description: product.desc,
             priceInRs:product.price,
-            count: product.available,
+            count: product.quantity - product.available,
           };
         })
       );

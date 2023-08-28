@@ -22,7 +22,9 @@ let fetchProductItems = async (id) => {
     shopItems = data.Products.map((item) => ({
       id: item.id,
       count: item.count,
-      price: item.price,
+      price: item.priceInRs,
+      title: item.title,
+      description: item.description,
     }));
     generatetable(); // Call the function to generate the shop interface
   } catch (error) {
@@ -36,16 +38,21 @@ function generatetable() {
   const tableRows = shopItems.map((item, index) => {
     return `<tr>
       <td>${index +1}</td>
+      <td>${item.title}</td>
+      <td>${item.description}</td>
       <td>${item.count}</td>
-      <td>${item.price}</td>
-      <td>${item.price * item.count}</td>
+      <td>${item.price}</td>      
+      <td>${totalAmount}</td>
       <td>${amountOwed}</td>
+
     </tr>`;
   });
   const tableHTML = `<table>
   <thead>
   <tr>
     <th>ID</th>
+    <th>Title</th>
+    <th>Description</th>
     <th>Count</th>
     <th>Price</th>
     <th>Total Amount</th>
